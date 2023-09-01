@@ -26,9 +26,9 @@ jobs:
           echo third ref :: ${{ github.ref }}
           echo head ref :: ${{ github.head_ref }}
           echo base ref :: ${{ github.base_ref }}
-          echo GITHUB_SERVER_URL :: ${{ GITHUB_SERVER_URL}}
-          echo GITHUB_REPOSITORY :: ${{ GITHUB_REPOSITORY }}
-          echo GITHUB_RUN_ID :: ${{ GITHUB_RUN_ID }}
+          echo GITHUB_SERVER_URL :: ${GITHUB_SERVER_URL}
+          echo GITHUB_REPOSITORY :: ${GITHUB_REPOSITORY}
+          echo GITHUB_RUN_ID :: ${GITHUB_RUN_ID}
 
       # Bump version on merging Pull Requests with specific labels. (bump:major,bump:minor,bump:patch)
     #   - id: bumpversion
