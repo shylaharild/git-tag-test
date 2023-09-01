@@ -29,7 +29,7 @@ jobs:
           echo GITHUB_SERVER_URL :: ${GITHUB_SERVER_URL}
           echo GITHUB_REPOSITORY :: ${GITHUB_REPOSITORY}
           echo GITHUB_RUN_ID :: ${GITHUB_RUN_ID}
-          echo TOKEN ::  ${INPUT_GITHUB_TOKEN}
+          echo TOKEN ::  ${{ github.token }}
 
       # Bump version on merging Pull Requests with specific labels. (bump:major,bump:minor,bump:patch)
     #   - id: bumpversion
