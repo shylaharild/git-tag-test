@@ -1,0 +1,44 @@
+name: checking
+on:
+  push:
+    branches-ignore:
+      - '**'
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  bump-version:
+    # Skip on Pull Request Close event.
+    # if: "!(github.event_name == 'pull_request' && !github.event.pull_request.merged)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        # with:
+        #   fetch-depth: 0
+      # This is to fast-forward the commits from the base branch to the current branch
+      - id: fast-forward
+        run: |
+          git config pull.ff only
+
+      - id: branch
+        run: |
+          echo First ref :: ${GITHUB_REF##*/}
+          GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/heads/}}
+          echo branch :: $GIT_BRANCH
+          echo second ref :: ${GITHUB_REF#refs/*/}
+          echo third ref :: ${{ github.ref }}
+          echo head ref :: ${{ github.head_ref }}
+          echo base ref :: ${{ github.base_ref }}
+          echo GITHUB_SERVER_URL :: ${{ GITHUB_SERVER_URL}}
+          echo GITHUB_REPOSITORY :: ${{ GITHUB_REPOSITORY }}
+          echo GITHUB_RUN_ID :: ${{ GITHUB_RUN_ID }}
+
+      # Bump version on merging Pull Requests with specific labels. (bump:major,bump:minor,bump:patch)
+    #   - id: bumpversion
+    #     if: github.event.pull_request.merged
+    #     env:
+    #       PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
+    #       PR_BRANCH: ${{ github.head_ref }}
+    #       SOURCE_BRANCH: ${{ github.base_ref }}
+    #     run: bash -x .github/scripts/bump_version.sh -p maven -l "${PR_LABELS}"
+          

@@ -1,0 +1,6 @@
+# Ading bump:minor label to any PR automatically
+'bump:minor':
+- '**'
+- '**/.*'
+- '**/.*/**'
+- '**/.*/**/.*'
