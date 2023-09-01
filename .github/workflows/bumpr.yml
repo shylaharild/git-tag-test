@@ -1,7 +1,7 @@
 name: checking
 on:
   pull_request:
-    types: [opened, reopened, labeled, unlabeled]
+    types: [opened, reopened, labeled, unlabeled, synchronize]
 
 jobs:
   bump-version:
