@@ -30,6 +30,8 @@ jobs:
           echo GITHUB_REPOSITORY :: ${GITHUB_REPOSITORY}
           echo GITHUB_RUN_ID :: ${GITHUB_RUN_ID}
           echo TOKEN ::  ${{ github.token }}
+          echo PR_NUMBER :: ${{ github.event.number }}
+          echo PR_TITLE :: ${{ github.event.title }}
 
       # Bump version on merging Pull Requests with specific labels. (bump:major,bump:minor,bump:patch)
     #   - id: bumpversion
