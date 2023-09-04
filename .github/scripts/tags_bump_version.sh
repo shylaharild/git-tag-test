@@ -69,6 +69,9 @@ finish() {
 
 get_current_version() {
   local current_version
+  git fetch --tags
+  # This suppress an error occurred when the repository is a complete one.
+  git fetch --prune --unshallow || true
   current_version=$(git describe --tags --abbrev=0)
   
   echo "${current_version}"
@@ -111,6 +114,11 @@ increment_version() {
   local major_version
   local minor_version
   local patch_version
+
+  if [[ -z "${current_version}" ]]; then
+    current_version="0.0.0"
+  fi
+
   major_version=$(cut -d '.' -f1 <<<"${current_version}")
   minor_version=$(cut -d '.' -f2 <<<"${current_version}")
   patch_version=$(cut -d '.' -f3 <<<"${current_version}")
