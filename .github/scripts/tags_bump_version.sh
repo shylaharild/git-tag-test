@@ -24,6 +24,8 @@ parse_params() {
   github_labels=""
   github_user=""
   github_token=""
+  pr_title=""
+  pr_number=""
 
   while :; do
     case "${1-}" in
@@ -39,6 +41,14 @@ parse_params() {
         ;;
       -x | --github_token)
         github_token="${2-}"
+        shift
+        ;;
+      -t | --pr_title)
+        pr_title="${2-}"
+        shift
+        ;;
+      -n | --pr_number)
+        pr_number="${2-}"
         shift
         ;;
       -?*)
@@ -57,6 +67,16 @@ parse_params() {
   if [[ "${github_token}" == "" ]]; then
     die "${SCRIPT_NAME}" \
       "you must specify the github_token (using -x or --github_token <{ github.token }>)" 1
+  fi
+
+  if [[ "${pr_title}" == "" ]]; then
+    die "${SCRIPT_NAME}" \
+      "you must specify the pr_title (using -t or --pr_title <title>)" 1
+  fi
+
+  if [[ "${pr_number}" == "" ]]; then
+    die "${SCRIPT_NAME}" \
+      "you must specify the pr_number (using -n or --pr_number <pr number>)" 1
   fi
 
   return 0
@@ -160,11 +180,12 @@ post_message() {
   local incremented_version="${2:-}"
   local github_user="${3:-}"
   local github_token="${4:-}"
+  local pr_number="${5:-}"
   local message
   local body
   local endpoint
   
-  endpoint="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
+  endpoint="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${pr_number}/comments"
   message="[Bumped!](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) Version [v${current_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${current_version}) -> [v${incremented_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${incremented_version})"
   body="$(echo ${message} | jq -ncR '{body: input}')"
 
@@ -191,13 +212,13 @@ main() {
     log "${SCRIPT_NAME}" "INFO" "bumping the version..."
     bump_version "${incremented_version}" "${increment_type}" "${github_user}"
     log "${SCRIPT_NAME}" "INFO" "posting message on the PR..."
-    post_message "${current_version}" "${incremented_version}" "${github_user}" "${github_token}"
+    post_message "${current_version}" "${incremented_version}" "${github_user}" "${github_token}" "${pr_number}"
   else
     log "${SCRIPT_NAME}" "WARN" "not bumping the version (dryrun)"
     log "${SCRIPT_NAME}" "WARN" "current version is ${current_version}"
     log "${SCRIPT_NAME}" "WARN" "incremented version is ${incremented_version}"
-    log "${SCRIPT_NAME}" "WARN" "PR number is ${PR_NUMBER}"
-    log "${SCRIPT_NAME}" "WARN" "PR title is ${PR_TITLE}"
+    log "${SCRIPT_NAME}" "WARN" "PR number is ${pr_number}"
+    log "${SCRIPT_NAME}" "WARN" "PR title is ${pr_title}"
   fi
 }
 

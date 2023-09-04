@@ -51,5 +51,7 @@ jobs:
           PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
           ORG_GITHUB_USER: org_sri_user
           GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: bash -x .github/scripts/tags_bump_version.sh -l "${PR_LABELS}" -u "${ORG_GITHUB_USER}" -x "${GITHUB_TOKEN}" --dryrun
           
