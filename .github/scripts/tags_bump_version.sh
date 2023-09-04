@@ -23,8 +23,7 @@ parse_params() {
   dryrun=0
   github_labels=""
   github_user=""
-  pr_title=""
-  pr_number=""
+  github_token=""
 
   while :; do
     case "${1-}" in
@@ -38,12 +37,8 @@ parse_params() {
         github_user="${2-}"
         shift
         ;;
-      -p | --pr_number)
-        pr_number="${2-}"
-        shift
-        ;;
-      -t | --pr_title)
-        pr_title="${2-}"
+      -x | --github_token)
+        github_token="${2-}"
         shift
         ;;
       -?*)
@@ -59,6 +54,11 @@ parse_params() {
       "you must specify the github_user (using -u or --github_user <username>)" 1
   fi
 
+  if [[ "${github_token}" == "" ]]; then
+    die "${SCRIPT_NAME}" \
+      "you must specify the github_token (using -x or --github_token <{ github.token }>)" 1
+  fi
+
   return 0
 }
 
@@ -68,7 +68,6 @@ finish() {
 }
 
 get_current_version() {
-  local package_type="${1:-}"
   local current_version
   current_version=$(git describe --tags --abbrev=0)
   
@@ -137,10 +136,9 @@ increment_version() {
 }
 
 bump_version() {
-  local package_type="${1:-}"
-  local incremented_version="${2:-}"
-  local increment_type="${3:-}"
-  local github_user="${4:-}"
+  local incremented_version="${1:-}"
+  local increment_type="${2:-}"
+  local github_user="${3:-}"
 
   git config user.name "${github_user}"
   git config user.email "${github_user}@users.noreply.github.com"
@@ -153,11 +151,16 @@ post_message() {
   local current_version="${1:-}"
   local incremented_version="${2:-}"
   local github_user="${3:-}"
+  local github_token="${4:-}"
   local message
-
+  local body
+  local endpoint
+  
+  endpoint="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments"
   message="[Bumped!](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) Version [v${current_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${current_version}) -> [v${incremented_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${incremented_version})"
-  
-  
+  body="$(echo ${message} | jq -ncR '{body: input}')"
+
+  curl -H "Authorization: token ${github_token}" -d "${body}" "${endpoint}"
 }
 
 main() {
@@ -165,7 +168,7 @@ main() {
   parse_params "$@"
 
   local current_version
-  current_version=$(get_current_version "${package_type}")
+  current_version=$(get_current_version)
   log "${SCRIPT_NAME}" "INFO" "current version: ${current_version}"
 
   local increment_type
@@ -177,16 +180,16 @@ main() {
   log "${SCRIPT_NAME}" "INFO" "INCREMENTED VERSION: ${incremented_version}"
 
   if [[ $dryrun -eq 0 ]]; then
-    log "${SCRIPT_NAME}" "INFO" "writing bumped version to file..."
-    bump_version "${package_type}" "${incremented_version}" "${increment_type}"
-    if [[ $commit -eq 1 ]]; then
-      log "${SCRIPT_NAME}" "INFO" "committing the version bump changes..."
-      commit_changes "${current_version}" "${incremented_version}" "${github_user}"
-    else
-      log "${SCRIPT_NAME}" "WARN" "not committing as -c flag is not specified"
-    fi
+    log "${SCRIPT_NAME}" "INFO" "bumping the version..."
+    bump_version "${incremented_version}" "${increment_type}" "${github_user}"
+    log "${SCRIPT_NAME}" "INFO" "posting message on the PR..."
+    post_message "${current_version}" "${incremented_version}" "${github_user}" "${github_token}"
   else
-    log "${SCRIPT_NAME}" "WARN" "not writing bumped version to file (dryrun)"
+    log "${SCRIPT_NAME}" "WARN" "not bumping the version (dryrun)"
+    log "${SCRIPT_NAME}" "WARN" "current version is ${current_Version}"
+    log "${SCRIPT_NAME}" "WARN" "incremented version is ${incremented_version}"
+    log "${SCRIPT_NAME}" "WARN" "PR number is ${PR_NUMBER}"
+    log "${SCRIPT_NAME}" "WARN" "PR title is ${PR_TITLE}"
   fi
 }
 

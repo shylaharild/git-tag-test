@@ -34,11 +34,11 @@ jobs:
           echo PR_TITLE :: ${{ github.event.pull_request.title }}
 
       # Bump version on merging Pull Requests with specific labels. (bump:major,bump:minor,bump:patch)
-    #   - id: bumpversion
-    #     if: github.event.pull_request.merged
-    #     env:
-    #       PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
-    #       PR_BRANCH: ${{ github.head_ref }}
-    #       SOURCE_BRANCH: ${{ github.base_ref }}
-    #     run: bash -x .github/scripts/bump_version.sh -p maven -l "${PR_LABELS}"
+      - id: bumpversion
+        # if: github.event.pull_request.merged
+        env:
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels) }}
+          ORG_GITHUB_USER: org_sri_user
+          GITHUB_TOKEN: ${{ github.token }}
+        run: bash -x .github/scripts/tags_bump_version.sh -l "${PR_LABELS}" -u "${ORG_GITHUB_USER}" -x "${GITHUB_TOKEN}" --dryrun
           
