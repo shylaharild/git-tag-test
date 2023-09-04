@@ -194,7 +194,7 @@ main() {
     post_message "${current_version}" "${incremented_version}" "${github_user}" "${github_token}"
   else
     log "${SCRIPT_NAME}" "WARN" "not bumping the version (dryrun)"
-    log "${SCRIPT_NAME}" "WARN" "current version is ${current_Version}"
+    log "${SCRIPT_NAME}" "WARN" "current version is ${current_version}"
     log "${SCRIPT_NAME}" "WARN" "incremented version is ${incremented_version}"
     log "${SCRIPT_NAME}" "WARN" "PR number is ${PR_NUMBER}"
     log "${SCRIPT_NAME}" "WARN" "PR title is ${PR_TITLE}"
