@@ -33,6 +33,8 @@ jobs:
           echo PR_NUMBER :: ${{ github.event.number }}
           echo PR_TITLE :: ${{ github.event.pull_request.title }}
           git fetch --tags
+          # This suppress an error occurred when the repository is a complete one.
+          git fetch --prune --unshallow || true
           git describe --abbrev=0 --tags
 
       - uses: actions-ecosystem/action-release-label@v1
