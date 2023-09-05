@@ -1,0 +1,15 @@
+name: PR Label
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled]
+jobs:
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: labeler
+        if: |
+          !contains(github.event.pull_request.labels.*.name, 'bump:major') && 
+          !contains(github.event.pull_request.labels.*.name, 'bump:minor') && 
+          !contains(github.event.pull_request.labels.*.name, 'bump:patch')
+        uses: actions/labeler@v4
