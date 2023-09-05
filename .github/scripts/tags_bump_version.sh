@@ -186,7 +186,7 @@ post_message() {
   local endpoint
   
   endpoint="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${pr_number}/comments"
-  message="[Bumped!](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) Version [v${current_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${current_version}) -> [v${incremented_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${incremented_version})"
+  message="🥳 🎉 [Bumped!](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) 🚀 Version [v${current_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${current_version}) -> [v${incremented_version}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${incremented_version}) ⬆️"
   body="$(echo ${message} | jq -ncR '{body: input}')"
 
   curl -H "Authorization: token ${github_token}" -d "${body}" "${endpoint}"
